@@ -1,0 +1,394 @@
+//Admin_function.h========================================================================================================================================================
+Function ad_mvlist(movie):
+    Print a header for "Movie List" with a line of asterisks
+    Print column headers: "No.", "Movie Code", "Movie Name"
+    
+    For i from 0 to 9:
+        Print the movie number (i+1), movie code, and movie name from movie.mv_list[i]
+
+    Print "-- End Of List --"
+Function ad_hallstatus(hall):
+    Initialize hall_seat to 0
+    Initialize repeat to true
+    Initialize hall_num as empty character
+    
+    While hall_num is invalid or repeat is true:
+        Prompt user to enter a hall number
+        Read hall_num from input
+        
+        If hall_num is not a digit or hall_num is out of range (1-10):
+            Print "Invalid Hall Number. Please re-enter."
+            Set repeat to true
+        Else:
+            Convert hall_num to integer num
+            Set repeat to false
+            
+            Print "Hall Number" and the movie playing in that hall
+            
+            Initialize hall_seat to 0
+            
+            For i from 0 to 9:
+                For j from 0 to 9:
+                    If hall.hall_seat[num][i][j] is empty:
+                        Print "O" (available seat)
+                        Increment hall_seat
+                    Else:
+                        Print "X" (occupied seat)
+            
+            Print "Seat Not Available (X) / Seat Available (O)"
+            Print the number of available seats
+Function ad_salesreport(movie):
+    Print a header for "Sales Status" with a line of asterisks
+    Print column headers: "Movie Code", "Movie Title", "Revenue"
+    
+    Print a line of dashes
+    
+    For i from 0 to 9:
+        Print the movie code, movie title, and revenue from movie.mv_list[i]
+    
+    Print a line of dashes
+Function ad_addmovie(movie, hall):
+    Initialize mv_name as empty string
+    Initialize mv_code as empty string
+    Initialize confirm as empty character
+    Initialize flag to true
+    Initialize count to 0
+    
+    For i from 0 to 9:
+        If movie.mv_list[i][0] is not empty:
+            Increment count
+    
+    If count equals 10:
+        Print "Movie List is Full. Cannot add more movie."
+        Exit function
+    
+    While mv_name is empty or flag is true:
+        Prompt user to enter movie name
+        Read mv_name from input
+        
+        If mv_name is empty:
+            Print "Invalid Movie Name. Please re-enter."
+        Else:
+            Set flag to false
+    
+    While confirm is not 'y' or 'n' or flag is false:
+        Prompt user to confirm adding the movie
+        Read confirm from input
+        
+        If confirm is not valid:
+            Print "Invalid Input. Please re-enter."
+            Set flag to false
+        Else:
+            If confirm is 'y':
+                Set flag to true
+                Generate mv_code using autoCode(movie)
+                For i from 0 to 9:
+                    If movie.mv_list[i][0] is empty:
+                        Set movie.mv_list[i][0] to mv_code
+                        Set movie.mv_list[i][1] to mv_name
+                        Break loop
+                Print the movie code and name
+                Print "Movie is successfully inserted!"
+            Else if confirm is 'n':
+                Set mv_name to empty
+                Print "Operation Cancelled."
+                Break loop
+            Else:
+                Print "Invalid Input. Please re-enter."
+Function autoCode(movie):
+    Seed random number generator
+    Initialize chr array with 4 characters
+    Initialize num array with 5 characters
+    
+    For i from 0 to 2:
+        Set chr[i] to a random uppercase letter
+    
+    Set chr[3] to null terminator
+    For j from 0 to 3:
+        Set num[j] to a random digit
+    
+    Set num[4] to null terminator
+    
+    Combine chr and num to form code
+    
+    For k from 0 to 9:
+        If code matches any existing movie code in movie.mv_list:
+            Call autoCode recursively to generate a new code
+    
+    Return code
+Function ad_dltmovie(movie, hall):
+    Initialize mv_code as empty string
+    Initialize confirm as empty character
+    Initialize flag to true
+    Initialize count to 0
+    
+    For i from 0 to 9:
+        If movie.mv_list[i][0] is empty:
+            Increment count
+    
+    If count equals 10:
+        Print "Movie List is Empty. Cannot delete more movie."
+        Exit function
+    
+    While mv_code is empty or flag is true:
+        Prompt user to enter movie code
+        Read mv_code from input
+        
+        If mv_code is empty:
+            Print "Invalid Movie Code. Please re-enter."
+        Else:
+            Set flag to false
+    
+    While confirm is not 'y' or 'n' or flag is false:
+        Prompt user to confirm deleting the movie
+        Read confirm from input
+        
+        If confirm is not valid:
+            Print "Invalid Input. Please re-enter."
+            Set flag to false
+        Else:
+            If confirm is 'y':
+                Set flag to true
+                For i from 0 to 9:
+                    If movie.mv_list[i][0] matches mv_code:
+                        Set movie.mv_list[i][0] and [1] to empty
+                        Print "Movie is successfully deleted!"
+                        Break loop
+                If flag is false:
+                    Print "Movie not found!"
+                    Repeat the input prompt
+            Else if confirm is 'n':
+                Set mv_code to empty
+                Print "Operation Cancelled."
+                Break loop
+            Else:
+                Print "Invalid Input. Please re-enter."
+
+
+//Booking_Tickets_FIN.cpp===================================================================================================================================================
+// Define constants for seat references
+DEFINE alphabs AS array ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+DEFINE list_nums AS array ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+
+CLASS Movie:
+    VARIABLES:
+        - name: string
+        - length: string
+        - genre: string
+        - language: string
+        - dates: vector of strings
+        - time: vector of strings
+        - booking_data: map of date -> map of time -> vector of seat pairs
+
+    CONSTRUCTOR Movie(name, length, genre, language, dates, times):
+        INITIALIZE name, length, genre, language, dates, time
+        INITIALIZE booking_data WITH call to initialize_booking(dates, times)
+
+    FUNCTION initialize_booking(dates, times):
+        CREATE main_dict AS empty map
+        FOR EACH date IN dates:
+            CREATE plc_dict AS empty map
+            FOR EACH time IN times:
+                SET plc_dict[time] TO empty vector of seat pairs
+            SET main_dict[date] TO plc_dict
+        RETURN main_dict
+
+    FUNCTION print_info():
+        PRINT movie information: name, length, genre, language
+
+    FUNCTION in_date():
+        PRINT available dates
+        WHILE TRUE:
+            PROMPT user to enter date
+            IF entered date IS IN dates THEN
+                RETURN entered date
+            PRINT "Invalid date, please try again."
+
+    FUNCTION in_time():
+        PRINT available times
+        WHILE TRUE:
+            PROMPT user to enter time
+            IF entered time IS IN time THEN
+                RETURN entered time
+            PRINT "Invalid time, please try again."
+
+    FUNCTION return_seats(date, time):
+        RETURN booking_data[date][time] // returns vector of booked seats
+
+    FUNCTION show_seats(booked_seats):
+        PRINT seat layout header
+        FOR EACH letter IN alphabs:
+            PRINT letter
+            FOR EACH col IN list_nums:
+                IF (letter, col) IN booked_seats THEN
+                    PRINT "|XX|" // occupied
+                ELSE
+                    PRINT "|  |" // unoccupied
+            PRINT newline
+
+    FUNCTION in_seats(date, time):
+        WHILE TRUE:
+            PROMPT user to enter seat letter
+            CONVERT seat letter to uppercase
+            IF seat letter IS NOT IN alphabs THEN
+                PRINT "Invalid row. Please try again."
+                CONTINUE
+            PROMPT user to enter seat number
+            IF seat number IS NOT IN list_nums THEN
+                PRINT "Invalid seat number. Please try again."
+                CONTINUE
+            CREATE seat_n AS pair (seat letter, seat number)
+            IF seat_n IS IN booked_seats THEN
+                PRINT "Seat already booked. Please choose another seat."
+            ELSE
+                ADD seat_n TO booked_seats
+                PRINT "Seat booked successfully!"
+                CALL show_seats(booked_seats)
+                RETURN seat_n
+
+    FUNCTION booking(date, time):
+        IF date IS EMPTY AND time IS EMPTY THEN
+            CALL in_date() TO SET date
+            CALL in_time() TO SET time
+        IF booked seats >= 100 THEN
+            PRINT "Sorry, all seats are booked. Please try another date and time."
+            RETURN tuple with empty values
+        CALL show_seats(booked_seats)
+        CALL in_seats(date, time) TO GET seat_n
+        RETURN tuple (date, time, seat_n, movie name)
+
+// Define BookingInfo structure
+STRUCT BookingInfo:
+    VARIABLES:
+        - movie_name: string
+        - date: string
+        - time: string
+        - ticket_amount: integer
+        - seat_store: vector of seat pairs
+
+FUNCTION booking_main(movie_list):
+    CREATE main_store AS BookingInfo
+    INITIALIZE date, time, seat_store AS empty values
+    PRINT available movies
+    WHILE TRUE:
+        PROMPT user to select movie or exit
+        IF selected_movie_idx IS VALID THEN
+            GET selected_movie FROM movie_list
+            PROMPT user to enter ticket amount
+            FOR i FROM 0 TO ticket_amount - 1:
+                CALL selected_movie.booking(date, time) TO GET date, time, seat_n, movie_name
+                IF movie_name IS EMPTY THEN
+                    CONTINUE
+                ADD seat_n TO seat_store
+                SET main_store fields (movie_name, date, time)
+            SET main_store.ticket_amount TO ticket_amount
+            SET main_store.seat_store TO seat_store
+            RETURN main_store
+        ELSE IF selected_movie_idx IS 0 THEN
+            PRINT "Exiting booking menu."
+            BREAK
+        ELSE
+            PRINT "Invalid Input. Please try again."
+    RETURN main_store
+
+MAIN:
+    CREATE booking_info AS BookingInfo
+    CREATE movie1 AS Movie("The Matrix", "2h", "Sci-Fi", "English", ["1", "2", "3", "4"], ["12:30", "1:30", "2:00", "3:45"])
+    CREATE movie2 AS Movie("Kung Fu Panda", "2hr 30min", "Comedy", "English", ["1", "2", "3", "4"], ["12:30", "1:30", "2:00", "3:45"])
+    CREATE movie3 AS Movie("Deadpool 3", "2hr 40min", "Action", "English", ["1", "2", "3", "4"], ["12:30", "1:30", "2:00", "3:45"])
+    CREATE movie_list AS vector of movie1, movie2, movie3
+    CALL booking_main(movie_list) TO SET booking_info
+    PRINT booking summary: movie_name, date, time, ticket_amount, seat_store
+
+//customer_invoice_receipt.h================================================================================================================================================
+FUNCTION autoID()
+    SEED random number generator with current time
+    CREATE an array num with 9 characters
+
+    FOR i FROM 0 TO 7
+        SET num[i] TO a random digit (0-9) as a character
+
+    SET num[8] TO the null terminator '\0'
+
+    RETURN num as a string
+
+FUNCTION pay_decision()
+    DISPLAY payment method choices:
+        1. Credit Card
+        2. Debit Card
+        3. Cash
+        4. E-Wallet
+
+    INITIALIZE choice as a blank character
+    INITIALIZE flag as false
+
+    WHILE flag is false
+        PROMPT user to enter payment method
+        READ choice from input
+
+        IF choice is whitespace or alphabetic THEN
+            DISPLAY "Invalid Input. Please re-enter."
+            CONTINUE the loop
+
+        ELSE IF choice is one of '1', '2', '3', or '4' THEN
+            SET flag to true
+            BREAK the loop
+
+        ELSE
+            DISPLAY "Invalid Input. Please re-enter."
+
+    RETURN choice converted to integer (choice - '0')
+
+FUNCTION payMethDec()
+    INITIALIZE pay_type as 0
+    INITIALIZE pay_dis as a blank string
+
+    CALL pay_decision() and store result in pay_type
+
+    SWITCH pay_type
+        CASE 1:
+            SET pay_dis to "Credit Card"
+        CASE 2:
+            SET pay_dis to "Debit Card"
+        CASE 3:
+            SET pay_dis to "Cash"
+        DEFAULT:
+            SET pay_dis to "E-wallet"
+
+    RETURN pay_dis
+
+FUNCTION rtc()
+    GET current time and store in timestamp
+    CONVERT timestamp to local time and store in datetime
+
+    INITIALIZE output as an array of 50 characters
+
+    FORMAT datetime to "day/month/year" and store in output
+
+    RETURN output as a string
+
+FUNCTION invoice()
+    CALL rtc() and store result in date
+
+    DISPLAY invoice with:
+        - Invoice ID
+        - Current date
+        - List of items with prices
+        - Subtotal
+        - Discount
+        - Service Charge (5%)
+        - Tax
+        - Total Items
+        - Total Payable
+
+FUNCTION receipt()
+    CALL payMethDec() and store result in pay_dis
+
+    DISPLAY receipt with:
+        - Movie Title
+        - Time
+        - Hall
+        - Seat ID
+        - Price
+        - Payment Method
+

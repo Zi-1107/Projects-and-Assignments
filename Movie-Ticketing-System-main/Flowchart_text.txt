@@ -1,0 +1,138 @@
+1. ad_mvlist Flowchart
+Start
+Print Header: "Movie List"
+Print Column Headers: "No.", "Movie Code", "Movie Name"
+For i = 0 to 9
+Print (i+1, movie.mv_list[i][0], movie.mv_list[i][1])
+Print "-- End Of List --"
+End
+2. ad_hallstatus Flowchart
+Start
+Initialize hall_seat = 0, repeat = true, hall_num = ' '
+While hall_num is invalid or repeat is true
+Prompt "Enter Hall Number"
+Read hall_num
+If hall_num is not valid
+Print "Invalid Hall Number. Please re-enter."
+Set repeat = true
+Else
+Convert hall_num to num
+If num is within range (1-10)
+Set repeat = false
+Print "Hall Number" and movie playing
+Initialize hall_seat = 0
+For i = 0 to 9
+For j = 0 to 9
+If hall.hall_seat[num][i][j] is empty
+Print "O"
+Increment hall_seat
+Else
+Print "X"
+Print "Seat Not Available (X) / Seat Available (O)"
+Print number of available seats
+Else
+Print "Invalid Hall Number. Please re-enter."
+Set repeat = true
+End
+3. ad_salesreport Flowchart
+Start
+Print Header: "Sales Status"
+Print Column Headers: "Movie Code", "Movie Title", "Revenue"
+Print Line of Dashes
+For i = 0 to 9
+Print (movie.mv_list[i][0], movie.mv_list[i][1], movie.revenue[i])
+Print Line of Dashes
+End
+4. ad_addmovie Flowchart
+Start
+Initialize mv_name = "", mv_code = "", confirm = ' ', flag = true, count = 0
+For i = 0 to 9
+If movie.mv_list[i][0] is not empty
+Increment count
+If count = 10
+Print "Movie List is Full. Cannot add more movie."
+End
+While mv_name is empty or flag is true
+Prompt "Enter Movie Name"
+Read mv_name
+If mv_name is empty
+Print "Invalid Movie Name. Please re-enter."
+Else
+Set flag = false
+While confirm is not 'y' or 'n' or flag is false
+Prompt "Are you sure to add [mv_name]? (Y/N)"
+Read confirm
+If confirm is invalid
+Print "Invalid Input. Please re-enter."
+Set flag = false
+Else
+If confirm = 'y'
+Generate mv_code using autoCode(movie)
+For i = 0 to 9
+If movie.mv_list[i][0] is empty
+Set movie.mv_list[i][0] = mv_code
+Set movie.mv_list[i][1] = mv_name
+Break loop
+Print "Movie Code", "Movie Name", and success message
+Else if confirm = 'n'
+Set mv_name = ""
+Print "Operation Cancelled."
+Break loop
+Else
+Print "Invalid Input. Please re-enter."
+End
+5. autoCode Flowchart
+Start
+Seed Random Number Generator
+Initialize chr array with 4 characters, num array with 5 characters
+For i = 0 to 2
+Set chr[i] to a random uppercase letter
+Set chr[3] to null terminator
+For j = 0 to 3
+Set num[j] to a random digit
+Set num[4] to null terminator
+Combine chr and num to form code
+For k = 0 to 9
+If code matches any existing movie code in movie.mv_list
+Call autoCode recursively to generate a new code
+Return code
+End
+6. ad_dltmovie Flowchart
+Start
+Initialize mv_code = "", confirm = ' ', flag = true, count = 0
+For i = 0 to 9
+If movie.mv_list[i][0] is empty
+Increment count
+If count = 10
+Print "Movie List is Empty. Cannot delete more movie."
+End
+While mv_code is empty or flag is true
+Prompt "Enter Movie Code"
+Read mv_code
+If mv_code is empty
+Print "Invalid Movie Code. Please re-enter."
+Else
+Set flag = false
+While confirm is not 'y' or 'n' or flag is false
+Prompt "Are you sure to delete [mv_code]? (Y/N)"
+Read confirm
+If confirm is invalid
+Print "Invalid Input. Please re-enter."
+Set flag = false
+Else
+If confirm = 'y'
+For i = 0 to 9
+If movie.mv_list[i][0] matches mv_code
+Set movie.mv_list[i][0] and [1] to empty
+Print "Movie is successfully deleted!"
+Break loop
+If flag is false
+Print "Movie not found!"
+Repeat the input prompt
+Else if confirm = 'n'
+Set mv_code = ""
+Print "Operation Cancelled."
+Break loop
+Else
+Print "Invalid Input. Please re-enter."
+End
